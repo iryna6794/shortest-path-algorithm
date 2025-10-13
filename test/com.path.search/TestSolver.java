@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 
 public class TestSolver {
-    private static final String ROOT_PATH = "src/testdata";
+    private static final String ROOT_PATH = "test/testdata";
 
     public static void main(String[] args) {
         final List<Integer> searchedHubs = List.of(7, 37, 59, 82, 99, 115, 133, 165, 188, 197);
