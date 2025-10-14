@@ -4,7 +4,7 @@
 
 ### 1. Breadth-First Search (BFS)
 - **Class:** BSFSolver
-- **Description:** Finds the shortest path in an unweighted graph using a queue (LinkedList). Expands nodes in the order they are discovered.
+- **Description:** Finds the shortest path in a weighted graph using a queue (LinkedList). Expands nodes in the order they are discovered.
 
 ### 2. Dijkstra’s Algorithm (Binary Heap)
 - **Class:** DijkstraSolver
