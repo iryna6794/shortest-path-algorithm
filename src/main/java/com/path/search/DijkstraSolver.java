@@ -11,7 +11,7 @@ public class DijkstraSolver implements Solver {
         PriorityQueue<PathResult> queue = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
         Set<Integer> visited = new HashSet<>();
 
-        queue.add(new PathResult(number, 0, List.of(number)));
+        queue.add(new PathResult(number, 0, Arrays.asList(number)));
         minDistances.put(number, 0);
 
         while (!queue.isEmpty() && shortestPaths.size() < destinations.size()) {

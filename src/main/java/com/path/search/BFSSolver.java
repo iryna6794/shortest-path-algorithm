@@ -11,7 +11,7 @@ public class BFSSolver implements Solver {
         Set<List<Integer>> visitedPaths = new HashSet<>();
 
         Vertex vertex = vertexes.get(number);
-        searchPath(vertex, new PathResult(number, 0, List.of(vertex.getNumber())), destinations, pathResultMap, pathResultQueue);
+        searchPath(vertex, new PathResult(number, 0, Arrays.asList(vertex.getNumber())), destinations, pathResultMap, pathResultQueue);
 
         while (!pathResultQueue.isEmpty()) {
             PathResult pathResult = pathResultQueue.poll();

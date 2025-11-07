@@ -12,7 +12,7 @@ public class DijkstraTreeSetSolver implements Solver {
         TreeSet<PathResult> pathResultQueue = new TreeSet<>();
         Map<Integer, PathResult> pathResultMap = new HashMap<>();
 
-        PathResult startPathResult = new PathResult(number, 0, List.of(number));
+        PathResult startPathResult = new PathResult(number, 0, Arrays.asList(number));
         pathResultQueue.add(startPathResult);
         pathResultMap.put(number, startPathResult);
         minDistances.put(number, 0);

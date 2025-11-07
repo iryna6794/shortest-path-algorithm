@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class PathResult implements Comparable<PathResult> {
-    final int number;
-    final int distance;
-    final List<Integer> path;
+    public final int number;
+    public final int distance;
+    public final List<Integer> path;
 
     PathResult(int number, int distance, List<Integer> path) {
         this.number = number;
