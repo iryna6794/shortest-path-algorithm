@@ -5,62 +5,62 @@ import java.util.*;
 public class BFSSolver implements Solver {
 
     @Override
-    public Map<Integer, Node> findShortestPaths(Map<Integer, Hub> hubs, int source, List<Integer> searchedHubs) {
-        Queue<Node> nodeQueue = new LinkedList<>();
-        Map<Integer, Node> resultNodeMap = new HashMap<>();
-        Set<List<Integer>> visited = new HashSet<>();
+    public Map<Integer, PathResult> findShortestPaths(Map<Integer, Vertex> vertexes, int number, List<Integer> destinations) {
+        Queue<PathResult> pathResultQueue = new LinkedList<>();
+        Map<Integer, PathResult> pathResultMap = new HashMap<>();
+        Set<List<Integer>> visitedPaths = new HashSet<>();
 
-        Hub hub = hubs.get(source);
-        searchPath(hub, new Node(source, 0, List.of(hub.getNumber())), searchedHubs, resultNodeMap, nodeQueue);
+        Vertex vertex = vertexes.get(number);
+        searchPath(vertex, new PathResult(number, 0, List.of(vertex.getNumber())), destinations, pathResultMap, pathResultQueue);
 
-        while (!nodeQueue.isEmpty()) {
-            Node node = nodeQueue.poll();
-            if (visited.contains(node.path)) {
+        while (!pathResultQueue.isEmpty()) {
+            PathResult pathResult = pathResultQueue.poll();
+            if (visitedPaths.contains(pathResult.path)) {
                 continue;
             } else {
-                visited.add(node.path);
+                visitedPaths.add(pathResult.path);
             }
-            searchPath(hubs.get(node.hubNumber), node, searchedHubs, resultNodeMap, nodeQueue);
+            searchPath(vertexes.get(pathResult.number), pathResult, destinations, pathResultMap, pathResultQueue);
         }
-        return resultNodeMap;
+        return pathResultMap;
     }
 
-    private void searchPath(Hub parent,
-                            Node parentNode,
-                            List<Integer> searchedHubs,
-                            Map<Integer, Node> resultNodeMap,
-                            Queue<Node> nodeQueue) {
-        if (searchedHubs.size() == resultNodeMap.size()) {
+    private void searchPath(Vertex parent,
+                            PathResult parentPathResult,
+                            List<Integer> destinations,
+                            Map<Integer, PathResult> resultNodeMap,
+                            Queue<PathResult> pathResultQueue) {
+        if (destinations.size() == resultNodeMap.size()) {
             OptionalInt maxOp = resultNodeMap.values().stream()
                     .mapToInt(node -> node.distance)
                     .max();
-            if (maxOp.isPresent() && parentNode.distance >= maxOp.getAsInt()) {
+            if (maxOp.isPresent() && parentPathResult.distance >= maxOp.getAsInt()) {
                 return;
             }
         }
 
         if (parent != null) {
-            for (Vertex vertex : parent.getVertices()) {
+            for (Edge edge : parent.getNeighbours()) {
 
-                List<Integer> pathList = parentNode.path;
-                int neighbor = vertex.getNeighbor();
+                List<Integer> pathList = parentPathResult.path;
+                int number = edge.getNumber();
 
-                if (pathList.contains(neighbor)) {
+                if (pathList.contains(number)) {
                     continue;
                 }
 
-                List<Integer> newPathList = new ArrayList<>(parentNode.path);
-                newPathList.add(neighbor);
+                List<Integer> newPathList = new ArrayList<>(parentPathResult.path);
+                newPathList.add(number);
 
-                Node path = new Node(parent.getNumber(), parentNode.distance + vertex.getLength(), newPathList);
+                PathResult newPath = new PathResult(parent.getNumber(), parentPathResult.distance + edge.getLength(), newPathList);
 
-                if (searchedHubs.contains(neighbor)) {
-                    Node storedNode = resultNodeMap.get(neighbor);
-                    if (storedNode == null || path.distance < storedNode.distance) {
-                        resultNodeMap.put(neighbor, path);
+                if (destinations.contains(number)) {
+                    PathResult storedPathResult = resultNodeMap.get(number);
+                    if (storedPathResult == null || newPath.distance < storedPathResult.distance) {
+                        resultNodeMap.put(number, newPath);
                     }
                 }
-                nodeQueue.add(new Node(neighbor, path.distance, path.path));
+                pathResultQueue.add(new PathResult(number, newPath.distance, newPath.path));
             }
         }
     }

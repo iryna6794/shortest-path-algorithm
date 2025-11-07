@@ -15,21 +15,21 @@ public class TestSolver {
     private static final String ROOT_PATH = "test/testdata";
 
     public static void main(String[] args) {
-        final List<Integer> searchedHubs = List.of(7, 37, 59, 82, 99, 115, 133, 165, 188, 197);
+        final List<Integer> destinations = List.of(7, 37, 59, 82, 99, 115, 133, 165, 188, 197);
 
         System.out.println("\nTesting BFS:\n");
         LocalDateTime startBFS = LocalDateTime.now();
-        new TestSolver(new BFSSolver()).test(searchedHubs);
+        new TestSolver(new BFSSolver()).test(destinations);
         System.out.println("Total time for BFS: " + Duration.between(startBFS, LocalDateTime.now()).toMillis() + " ms");
 
         System.out.println("\nTesting Dijkstra:\n");
         LocalDateTime startDijkstra = LocalDateTime.now();
-        new TestSolver(new DijkstraSolver()).test(searchedHubs);
+        new TestSolver(new DijkstraSolver()).test(destinations);
         System.out.println("Total time for Dijkstra: " + Duration.between(startDijkstra, LocalDateTime.now()).toMillis() + " ms");
 
         System.out.println("\nTesting Dijkstra with TreeSet:\n");
         LocalDateTime startDijkstraTreeSet = LocalDateTime.now();
-        new TestSolver(new DijkstraTreeSetSolver()).test(searchedHubs);
+        new TestSolver(new DijkstraTreeSetSolver()).test(destinations);
         System.out.println("Total time for Dijkstra with TreeSet: " + Duration.between(startDijkstraTreeSet, LocalDateTime.now()).toMillis() + " ms");
     }
 
@@ -39,10 +39,10 @@ public class TestSolver {
         this.solver = solver;
     }
 
-    public void test(List<Integer> searchedHubs) {
+    public void test(List<Integer> destinations) {
         getSearchPaths().forEach(path -> {
             System.out.print("test " + path);
-            runTestForCase(path, searchedHubs);
+            runTestForCase(path, destinations);
         });
     }
 
@@ -61,18 +61,18 @@ public class TestSolver {
         return searchPaths;
     }
 
-    private void runTestForCase(String searchPath, List<Integer> searchedHubs) {
-        Map<Integer, Hub> hubs = readInputFromFile(String.format("%s/input_random_%s.txt", ROOT_PATH, searchPath));
+    private void runTestForCase(String searchPath, List<Integer> destinations) {
+        Map<Integer, Vertex> vertexes = readInputFromFile(String.format("%s/input_random_%s.txt", ROOT_PATH, searchPath));
         String expected = readOutputsFromFile(String.format("%s/output_random_%s.txt", ROOT_PATH, searchPath));
-        Map<Integer, List<Integer>> expectedPaths = readPathsFromFile(String.format("%s/paths_random_%s.txt", ROOT_PATH, searchPath), searchedHubs);
+        Map<Integer, List<Integer>> expectedPaths = readPathsFromFile(String.format("%s/paths_random_%s.txt", ROOT_PATH, searchPath), destinations);
 
-        test(hubs, expected, expectedPaths, searchedHubs);
+        test(vertexes, expected, expectedPaths, destinations);
     }
 
-    private void test(Map<Integer, Hub> hubs, String expected, Map<Integer, List<Integer>> expectedPaths, List<Integer> searchedHubs) {
+    private void test(Map<Integer, Vertex> vertexes, String expected, Map<Integer, List<Integer>> expectedPaths, List<Integer> destinations) {
         LocalDateTime startTime = LocalDateTime.now();
 
-        Result shostestPathResult = getResult(hubs, searchedHubs);
+        Result shostestPathResult = getResult(vertexes, destinations);
 
         LocalDateTime endTime = LocalDateTime.now();
         System.out.println(": " + Duration.between(startTime, endTime).toMillis() + " ms");
@@ -82,33 +82,33 @@ public class TestSolver {
         }
 
         expectedPaths.forEach((hubNumber, paths) -> {
-            Node node = shostestPathResult.shortestPaths.get(hubNumber);
-            if (node == null) {
+            PathResult pathResult = shostestPathResult.shortestPaths.get(hubNumber);
+            if (pathResult == null) {
                 System.err.println("No path found for hub " + hubNumber);
-            } else if (!node.path.equals(paths)) {
-                System.err.println("Path mismatch for hub " + hubNumber + ", expected " + paths + ", but got " + node.path);
+            } else if (!pathResult.path.equals(paths)) {
+                System.err.println("Path mismatch for hub " + hubNumber + ", expected " + paths + ", but got " + pathResult.path);
             }
         });
     }
 
-    private Result getResult(Map<Integer, Hub> hubs, List<Integer> searchedHubs) {
-        Map<Integer, Node> shortestPaths = solver.findShortestPaths(hubs, 1, searchedHubs);
-        String result = getResultList(shortestPaths, searchedHubs);
+    private Result getResult(Map<Integer, Vertex> vertexes, List<Integer> destinations) {
+        Map<Integer, PathResult> shortestPaths = solver.findShortestPaths(vertexes, 1, destinations);
+        String result = getResultList(shortestPaths, destinations);
         return new Result(shortestPaths, result);
     }
 
     static class Result {
-        public final Map<Integer, Node> shortestPaths;
+        public final Map<Integer, PathResult> shortestPaths;
         public final String result;
 
-        public Result(Map<Integer, Node> shortestPaths, String result) {
+        public Result(Map<Integer, PathResult> shortestPaths, String result) {
             this.shortestPaths = shortestPaths;
             this.result = result;
         }
     }
 
-    public static String getResultList(Map<Integer, Node> shortestPaths, List<Integer> searchedHubs) {
-        return searchedHubs.stream()
+    public static String getResultList(Map<Integer, PathResult> shortestPaths, List<Integer> destinations) {
+        return destinations.stream()
                 .map(shortestPaths::get)
                 .filter(Objects::nonNull)
                 .map(node -> node.distance)
@@ -147,16 +147,16 @@ public class TestSolver {
         return paths;
     }
 
-    private static Map<Integer, Hub> readInputFromFile(String fileName) {
-        Map<Integer, Hub> hubs = new HashMap<>();
+    private static Map<Integer, Vertex> readInputFromFile(String fileName) {
+        Map<Integer, Vertex> hubs = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.trim().split("\\s+");
                 int hubNumber = Integer.parseInt(tokens[0]);
-                Hub hub = new Hub(hubNumber);
-                getVertexesWithMinLength(tokens).forEach((neighbor, length) -> hub.addVertice(new Vertex(neighbor, length)));
-                hubs.put(hubNumber, hub);
+                Vertex vertex = new Vertex(hubNumber);
+                getVertexesWithMinLength(tokens).forEach((neighbor, length) -> vertex.addVertice(new Edge(neighbor, length)));
+                hubs.put(hubNumber, vertex);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

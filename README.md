@@ -8,7 +8,7 @@
 
 ### 2. Dijkstra’s Algorithm (Binary Heap)
 - **Class:** DijkstraSolver
-- **Description:** Finds the shortest path in a weighted graph using a priority queue (PriorityQueue). Always expands the node with the smallest known distance. Efficient for weighted graphs.
+- **Description:** Finds the shortest path in a weighted graph using a priority queue (PriorityQueue). Always expands the pathResult with the smallest known distance. Efficient for weighted graphs.
 
 ### 3. Dijkstra’s Algorithm (Ordered Queue)
 - **Class:** DijkstraTreeSetSolver

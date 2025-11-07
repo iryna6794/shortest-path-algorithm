@@ -1,35 +1,40 @@
 package com.path.search;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Vertex {
-    private final int neighbor;
-    private final int length;
+    private final int number;
+    private final Set<Edge> neighbours = new HashSet<>();
 
-    public Vertex(int neighbor, int length) {
-        this.neighbor = neighbor;
-        this.length = length;
+    public Vertex(int number) {
+        this.number = number;
     }
 
-    public int getNeighbor() {
-        return neighbor;
+    public int getNumber() {
+        return number;
     }
 
-    public int getLength() {
-        return length;
+    public Set<Edge> getNeighbours() {
+        return neighbours;
     }
 
+    public void addVertice(Edge vertice) {
+        neighbours.add(vertice);
+    }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
         Vertex vertex = (Vertex) o;
-        return neighbor == vertex.neighbor && length == vertex.length;
+        return number == vertex.number && neighbours.equals(vertex.neighbours);
     }
 
     @Override
     public int hashCode() {
-        int result = neighbor;
-        result = 31 * result + length;
+        int result = number;
+        result = 31 * result + neighbours.hashCode();
         return result;
     }
 }

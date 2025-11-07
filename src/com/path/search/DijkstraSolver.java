@@ -5,44 +5,44 @@ import java.util.*;
 public class DijkstraSolver implements Solver {
 
     @Override
-    public Map<Integer, Node> findShortestPaths(Map<Integer, Hub> hubs, int source, List<Integer> targets) {
-        Map<Integer, Node> shortestPaths = new HashMap<>();
+    public Map<Integer, PathResult> findShortestPaths(Map<Integer, Vertex> vertexes, int number, List<Integer> destinations) {
+        Map<Integer, PathResult> shortestPaths = new HashMap<>();
         Map<Integer, Integer> minDistances = new HashMap<>();
-        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
+        PriorityQueue<PathResult> queue = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
         Set<Integer> visited = new HashSet<>();
 
-        queue.add(new Node(source, 0, List.of(source)));
-        minDistances.put(source, 0);
+        queue.add(new PathResult(number, 0, List.of(number)));
+        minDistances.put(number, 0);
 
-        while (!queue.isEmpty() && shortestPaths.size() < targets.size()) {
-            Node current = queue.poll();
-            int hubNumber = current.hubNumber;
+        while (!queue.isEmpty() && shortestPaths.size() < destinations.size()) {
+            PathResult current = queue.poll();
+            int currentNumber = current.number;
             int currentDist = current.distance;
             List<Integer> currentPath = current.path;
 
-            if (visited.contains(hubNumber)) {
+            if (visited.contains(currentNumber)) {
                 continue;
             }
 
-            visited.add(hubNumber);
+            visited.add(currentNumber);
 
-            if (targets.contains(hubNumber)) {
-                shortestPaths.put(hubNumber, new Node(hubNumber, currentDist, currentPath));
+            if (destinations.contains(currentNumber)) {
+                shortestPaths.put(currentNumber, new PathResult(currentNumber, currentDist, currentPath));
             }
 
-            Hub hub = hubs.get(hubNumber);
-            if (hub == null) {
+            Vertex vertex = vertexes.get(currentNumber);
+            if (vertex == null) {
                 continue;
             }
 
-            for (Vertex vertex : hub.getVertices()) {
-                int neighbor = vertex.getNeighbor();
-                int newDist = currentDist + vertex.getLength();
+            for (Edge edge : vertex.getNeighbours()) {
+                int neighbor = edge.getNumber();
+                int newDist = currentDist + edge.getLength();
                 if (!minDistances.containsKey(neighbor) || newDist < minDistances.get(neighbor)) {
                     minDistances.put(neighbor, newDist);
                     List<Integer> newPath = new ArrayList<>(currentPath);
                     newPath.add(neighbor);
-                    queue.add(new Node(neighbor, newDist, newPath));
+                    queue.add(new PathResult(neighbor, newDist, newPath));
                 }
             }
         }

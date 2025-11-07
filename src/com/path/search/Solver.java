@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface Solver {
-    Map<Integer, Node> findShortestPaths(Map<Integer, Hub> hubs, int source, List<Integer> searchedHubs);
+    Map<Integer, PathResult> findShortestPaths(Map<Integer, Vertex> hubs, int number, List<Integer> searchedHubs);
 }
